@@ -13,16 +13,18 @@ router.get('/', restricted, (req, res) => {
 })
 // GET api/graphs/:id
 router.get('/:graphId', restricted, (req, res) => {
-    const graphId = req.params.graphId
+    const { graphId } = req.params;
     const username = req.decodedJwt.username
     Graphs
-    .findGraphById(graphId, username)
+    .findGraphById(graphId)
     .then(graph => {
-        Graphs.findAreas(graphId, username)
+        // Graphs.findAreas(graphId, username)
         // .then(areas => {
         //     graph[0].areas = areas;
         //     res.status(200).json(graph)
         // })
+        res.json(graph);
+
     })
     .catch(err => res.send(err))
 })

@@ -9,7 +9,7 @@ const server = express();
 configureMiddleware(server);
 
 server.use('/api/graphs', graphRouter)
-// server.use('/api/auth', authRouter)
+server.use('/api/auth', authRouter)
 
 server.get('/', (req, res) => {
     res.send("It's alive!");

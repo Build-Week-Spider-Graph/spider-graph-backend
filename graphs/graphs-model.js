@@ -17,16 +17,19 @@ module.exports = {
 // Graphs
 function findGraphs(username) {
     return db('graphs as g')
-    .join('users as u', 'u.id', 'g.user_id')
-    .select('g.*', 'u.username', 'g.id')
-    .where({ 'u.username': username })
+    // .join('users as u', 'u.id', 'g.user_id')
+    // .select('g.*', 'u.username', 'g.id')
+    // .where({ 'u.username': username })
 }
-function findGraphById(id, username) {
-    return db('graphs as g')
-    .join('users as u', 'u.id', 'g.user_id')
-    .select('g.*', 'u.username', 'g.id')
-    .where({ 'u.username': username })
-    .where({ 'g.id': id })
+function findGraphById(graphId, username) {
+    // return db('graphs as g')
+    // .join('users as u', 'u.id', 'g.user_id')
+    // .select('g.*', 'u.username', 'g.id')
+    // .where({ 'u.username': username })
+    // .where({ 'g.id': graphId })
+    return db('graphs')
+    .where({ "graphs.id": graphId })
+    .first();
 }
 async function addGraph(graph, username) {
     const {area, points, ...newGraph} = graph
