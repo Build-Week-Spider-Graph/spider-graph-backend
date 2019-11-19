@@ -6,7 +6,7 @@ This file is subject to change, and as such **should be checked from time to tim
 
 ## Base Url
 
-`https://spider-graph-backend.herokuapp.com`
+`https://build-week-spider-graph.herokuapp.com`
 
 ## Authentication
 
@@ -24,7 +24,7 @@ This file is subject to change, and as such **should be checked from time to tim
 **Request Body**
 ```
 {
-    "username": "Jane123",
+  "username": "Jane123",
 	"password": "secret",
 	"firstname": "Jane",
 	"lastname": "Doe",
@@ -42,7 +42,7 @@ This file is subject to change, and as such **should be checked from time to tim
 **Request Body**
 ```
 {
-    "username": "Jane123",
+  "username": "Jane123",
 	"password": "secret"
 }
 ```
@@ -55,17 +55,12 @@ This file is subject to change, and as such **should be checked from time to tim
 
 - Responds with graph data from all users.
 
-### GET Graph Data by user
 
-**In Progress**
-
-- Responds with graph data from the user alone.
-
-### GET Graph Data by graph id
+### GET Graph Data by graph id and username
 
 **GET** to `/api/graphs/:graphId`
 
-- Responds with graph data from one graph only, the one belonging to that id.
+- Responds with graph data from one graph only, the one belonging to that id. This can only be accessed if the user that is logged in 'owns' the graph with that id.
 
 ### GET Area Data by graph id
 
