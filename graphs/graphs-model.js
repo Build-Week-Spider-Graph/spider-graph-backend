@@ -5,11 +5,7 @@ module.exports = {
     findGraphById,
     addGraph,
     editGraph,
-<<<<<<< HEAD
     deleteGraph,
-=======
-    removeGraph,
->>>>>>> 1dda77307a669616fcb4e64729248a23519cdaff
 //
     findLines,
     findLineById,
@@ -331,21 +327,11 @@ function editPoint(point, id, username) {
         ...point,
     })
 }
-<<<<<<< HEAD
 function deletePoint(id, username) {
     return db('points')
       .where('id', id)
       .del();
   }
-=======
-
-function removeGraph(id) {
-    return db('graphs')
-    .where({ id })
-    .del();
-}
-
->>>>>>> 1dda77307a669616fcb4e64729248a23519cdaff
 // Collapse
 
 
