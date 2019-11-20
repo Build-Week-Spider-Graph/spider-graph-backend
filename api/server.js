@@ -1,8 +1,8 @@
 const express = require('express');
 const configureMiddleware = require('./conf-middleware')
 
-const graphRouter = require('../graphs/graphs-router')
 const authRouter = require('../auth/auth-router')
+const graphRouter = require('../graphs/graphs-router')
 
 const server = express();
 

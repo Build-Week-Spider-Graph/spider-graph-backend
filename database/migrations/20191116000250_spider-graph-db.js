@@ -76,6 +76,7 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
     return knex.schema
+        .dropTableIfExists('areas_points')
         .dropTableIfExists('users')
         .dropTableIfExists('graphs')
         .dropTableIfExists('lines')
