@@ -2,6 +2,9 @@ const superTest = require('supertest');
 const server = require('../api/server');
 const db = require('../database/dbConfig.js');
 
+const { add, findBy } = require('../users/users-model.js')
+
+
 const { 
     findGraphs,
     findGraphById,
@@ -83,4 +86,58 @@ describe('GET', function() {
             })
         })
     })
+}) 
+
+describe('POST security', function() {
+    describe('post to graphs', function() {
+        it('should return 400', function() {
+
+            return superTest(server).post('/api/graphs').then(res => {
+                expect(res.status).toBe(400);
+            })
+        })
+        it('should return JSON formatted res', function() {
+            return superTest(server).post('/api/graphs').then(res => {
+                expect(res.type).toMatch(/json/i);
+            })
+        })
+    })
+    describe('post to ', function() {
+        it('should return 400', function() {
+
+            return superTest(server).post('/api/graphs/1/lines').then(res => {
+                expect(res.status).toBe(400);
+            })
+        })
+        it('should return JSON formatted res', function() {
+            return superTest(server).post('/api/graphs/1/lines').then(res => {
+                expect(res.type).toMatch(/json/i);
+            })
+        })
+    })
+    describe('post to ', function() {
+        it('should return 400', function() {
+            return superTest(server).post('/api/graphs/1/areas').then(res => {
+                expect(res.status).toBe(400);
+            })
+        })
+        it('should return JSON formatted res', function() {
+            return superTest(server).post('/api/graphs/1/areas').then(res => {
+                expect(res.type).toMatch(/json/i);
+            })
+        })
+    })
+    describe('post to ', function() {
+        it('should return 400', function() {
+            return superTest(server).post('/api/graphs/1/lines/1/points').then(res => {
+                expect(res.status).toBe(400);
+            })
+        })
+        it('should return JSON formatted res', function() {
+            return superTest(server).post('/api/graphs/1/lines/1/points').then(res => {
+                expect(res.type).toMatch(/json/i);
+            })
+        })
+    })
+
 }) 

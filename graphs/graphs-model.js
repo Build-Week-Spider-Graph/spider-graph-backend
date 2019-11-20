@@ -5,6 +5,7 @@ module.exports = {
     findGraphById,
     addGraph,
     editGraph,
+    removeGraph,
 //
     findLines,
     findLineById,
@@ -285,6 +286,13 @@ async function addPoint(point, { graphId, lineId }, username) {
 
 function editPoint(point) {
 }
+
+function removeGraph(id) {
+    return db('graphs')
+    .where({ id })
+    .del();
+}
+
 // Collapse
 
 
