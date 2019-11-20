@@ -14,24 +14,19 @@ router.get('/', restricted, (req, res) => {
     .catch(err => res.send(err))
 })
 // GET api/graphs/:id
-router.get('/:graphId', restricted, (req, res) => {
+router.get('/:graphId', restricted, async (req, res) => {
     const graphId = req.params.graphId
     const username = req.decodedJwt.username
-    Graphs
-    .findGraphById(graphId, username)
-    .then(graph => {
-        Graphs.findAreas(graphId, username)
-        .then(areas => {
-            graph[0].areas = areas;
-            Graphs.findLines(graphId, username)
-            .then(lines => {
-                graph[0].lines = lines
-                res.status(200).json(graph)
-            })
-        })
-    })
-    .catch(err => res.send(err))
-})
+    let graph = await Graphs.findGraphById(graphId, username)
+    let lines = await Graphs.findLines(graphId, username)
+    for(let i=0; i<lines.length; i++) {
+       
+       var {graph_id, id} = lines [i]
+       const points = await Graphs.findPoints({graph_id, id}, username)
+       graph[0].lines[i].points = points
+    }
+ })
+
 // POST api/graphs/
 router.post('/', restricted, (req, res) => {
     const username = req.decodedJwt.username

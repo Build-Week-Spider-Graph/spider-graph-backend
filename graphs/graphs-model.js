@@ -211,6 +211,7 @@ async function findPoints({ graphId, lineId }, username) {
     }
         return await verify()
 }
+
 async function findPointsByAreaId({ graphId, areaId }, username) {
     async function verify() {
         const results = await db('areas as a')
