@@ -33,14 +33,10 @@ function findGraphs(username) {
     .where({ 'u.username': username })
 }
 function findGraphById(graphId, username) {
-    // return db('graphs as g')
-    // .join('users as u', 'u.id', 'g.user_id')
-    // .select('g.*', 'u.username', 'g.id')
-    // .where({ 'u.username': username })
-    // .where({ 'g.id': graphId })
-    return db('graphs')
-    .where({ "graphs.id": graphId })
-    .first();
+    return db('graphs as g')
+    .join('users as u', 'u.id', 'g.user_id')
+    .select('g.*', 'u.username', 'g.id')
+    .where({ 'g.id': graphId })
 }
 async function addGraph(graph, username) {
     const {area, points, ...newGraph} = graph
@@ -52,7 +48,7 @@ async function addGraph(graph, username) {
             .from('users')
             .where({ username })
     })
-    const [areaId] = await db('areas')
+    var [areaId] = await db('areas')
     .insert({
         ...area,
         graph_id: id
@@ -62,7 +58,7 @@ async function addGraph(graph, username) {
     await db('points')
     .insert({
         ...e,
-        area_id: areaId
+        areaId
         })
     })
     return findGraphById(id);
