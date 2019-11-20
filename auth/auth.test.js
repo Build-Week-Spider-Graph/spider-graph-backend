@@ -1,5 +1,3 @@
-const superTest = require('supertest');
-const server = require('../api/server');
 const db = require('../database/dbConfig.js');
 const Users = require('../users/users-model.js');
 
