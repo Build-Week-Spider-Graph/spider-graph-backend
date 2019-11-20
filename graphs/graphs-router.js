@@ -15,10 +15,10 @@ router.get('/', restricted, (req, res) => {
 })
 // GET api/graphs/:id
 router.get('/:graphId', restricted, (req, res) => {
-    const graphId = req.params.graphId
+    const { graphId } = req.params;
     const username = req.decodedJwt.username
     Graphs
-    .findGraphById(graphId, username)
+    .findGraphById(graphId)
     .then(graph => {
         Graphs.findAreas(graphId, username)
         .then(areas => {
@@ -248,6 +248,23 @@ router.delete('/:graphId/lines/:lineId/points/:pointId', restricted, (req, res) 
     })
     .catch(err => res.send(err))
 })
+router.delete('/:graphId', (req, res) => {
+    Graphs.remove(req.params.id)
+    .then(count => {
+      if (count > 0) {
+        res.status(200).json({ message: 'The graph has been deleted' });
+      } else {
+        res.status(404).json({ message: 'The hub could not be found' });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Error removing the graph',
+      });
+    });
+  });
+
 module.exports = router;
 // Collapse
 
