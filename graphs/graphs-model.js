@@ -1,9 +1,14 @@
-const db = require('../database/dbConfig.js')
+const db = require('../database/dbConfig')
+
 module.exports = {
     findGraphs,
     findGraphById,
     addGraph,
     editGraph,
+//
+    findLines,
+    findLineById,
+    addLine,
 //
     findAreas,
     findAreaById,
@@ -11,15 +16,16 @@ module.exports = {
     editArea,
 //
     findPoints,
+    findPointsByAreaId,
     addPoint,
     editPoint
 };
 // Graphs
 function findGraphs(username) {
     return db('graphs as g')
-    // .join('users as u', 'u.id', 'g.user_id')
-    // .select('g.*', 'u.username', 'g.id')
-    // .where({ 'u.username': username })
+    .join('users as u', 'u.id', 'g.user_id')
+    .select('g.*', 'g.id')
+    .where({ 'u.username': username })
 }
 function findGraphById(graphId, username) {
     // return db('graphs as g')
@@ -58,6 +64,68 @@ async function addGraph(graph, username) {
 }
 function editGraph(graph, id) {
 }
+async function findLines(graphId, username) {
+    async function verify() {
+        const results = await db('graphs as g')
+        .join('users as u', 'u.id', 'g.user_id')
+        .select('g.*', 'u.id', 'g.id')
+        .where({ 'u.username': username })
+        .where({ 'g.id': graphId })
+        if(!results.length){
+            return "This graph does not belong to the logged user"
+        } else {
+            return db('lines as l')
+            .join('graphs as g', 'g.id', 'l.graph_id')
+            .join('users as u', 'u.id', 'g.user_id')
+            .select('l.*', 'g.title as graph_title', 'l.id')
+            .where({ 'u.username': username })
+            .where({ 'g.id': graphId })
+        }
+    }
+        return await verify();
+}
+async function findLineById( { graphId, lineId }, username) {
+    async function verify() {
+        const results = await db('graphs as g')
+        .join('users as u', 'u.id', 'g.user_id')
+        .select('g.*', 'u.id', 'g.id')
+        .where({ 'u.username': username })
+        .where({ 'g.id': graphId })
+        if(!results.length){
+            return "This graph or area do not belong to the logged user"
+        } else {
+            return db('lines as l')
+            .join('graphs as g', 'g.id', 'l.graph_id')
+            .join('users as u', 'u.id', 'g.user_id')
+            .select('l.*', 'g.title as graph_title', 'l.id')
+            .where({ 'u.username': username })
+            .where({ 'l.id': lineId })
+            .where({ 'g.id': graphId })
+        }
+    }
+        return await verify()
+}
+async function addLine(line, graphId, username) {
+    async function verify() {
+    const results = await db('graphs as g')
+    .join('users as u', 'u.id', 'g.user_id')
+    .select('g.*', 'u.id', 'g.id')
+    .where({ 'u.username': username })
+    .where({ 'g.id': graphId })
+    if(!results.length){
+        return "This graph does not belong to the logged user"
+    } else {
+        const [id] = await db('lines')
+        .insert({
+            ...line,
+            graph_id: graphId
+        })
+        return await findLineById(id);
+        }
+    }
+    return await verify()
+}
+
 // Areas
 async function findAreas(graphId, username) {
     async function verify() {
@@ -67,7 +135,7 @@ async function findAreas(graphId, username) {
         .where({ 'u.username': username })
         .where({ 'g.id': graphId })
         if(!results.length){
-            return "This graph or area does not belong to the logged user"
+            return "This graph does not belong to the logged user"
         } else {
             return db('areas as a')
             .join('graphs as g', 'g.id', 'a.graph_id')
@@ -124,7 +192,29 @@ async function addArea(area, graphId, username) {
 function editArea(area, id) {
 }
 // Points
-async function findPoints({ graphId, areaId }, username) {
+async function findPoints({ graphId, lineId }, username) {
+    async function verify() {
+        const results = await db('lines as l')
+        .join('graphs as g', 'g.id', 'l.graph_id')
+        .join('users as u', 'u.id', 'g.user_id')
+        .select('l.*', 'u.username', 'g.id', 'l.id')
+        .where({ 'u.username': username })
+        .where({ 'g.id': graphId })
+        .where({ 'l.id': lineId })
+        if(!results.length){
+            return "This graph or area does not belong to the logged user"
+        } else {
+            return db('points as p')
+            .join('lines as l', 'l.id', 'p.line_id')
+            .join('graphs as g', 'g.id', 'l.graph_id')
+            .select('p.*')
+            .where({ 'g.id': graphId })
+            .where({ 'l.id': lineId })
+        }
+    }
+        return await verify()
+}
+async function findPointsByAreaId({ graphId, areaId }, username) {
     async function verify() {
         const results = await db('areas as a')
         .join('graphs as g', 'g.id', 'a.graph_id')
@@ -134,34 +224,34 @@ async function findPoints({ graphId, areaId }, username) {
         .where({ 'g.id': graphId })
         .where({ 'a.id': areaId })
         if(!results.length){
-            return "This graph or area does not belong to the logged user"
+            return "This graph and/or area does not belong to the logged user"
         } else {
-            return db('points as p')
-            .join('areas as a', 'a.id', 'p.area_id')
-            .join('graphs as g', 'g.id', 'a.graph_id')
-            .select('p.*')
-            .where({ 'g.id': graphId })
-            .where({ 'a.id': areaId })
+            return await db('areas_points as ap')
+            .join('points as p', 'p.id', 'ap.point_id')
+            .join('areas as a', 'a.id', 'ap.area_id')
+            .select('ap.*', 'a.title as area_title', 'p.label as point_label', 'p.position', 'p.line_id')
+            .where({'ap.area_id': areaId})
         }
     }
-        return await verify()
+    return await verify()
 }
-async function addPoint(point, { graphId, areaId }, username) {
+
+async function addPoint(point, { graphId, lineId }, username) {
     async function verify() {
-     const results = await db('areas as a')
-    .join('graphs as g', 'g.id', 'a.graph_id')
+     const results = await db('lines as l')
+    .join('graphs as g', 'g.id', 'l.graph_id')
     .join('users as u', 'u.id', 'g.user_id')
-    .select('a.*', 'u.username', 'g.id', 'a.id')
+    .select('l.*', 'u.username', 'g.id', 'l.id')
     .where({ 'u.username': username })
     .where({ 'g.id': graphId })
-    .where({ 'a.id': areaId })
+    .where({ 'l.id': lineId })
     if(!results.length){
         return "This graph and/or area does not belong to the logged user"
     } else {
         await db('points')
         .insert({
             ...point,
-            area_id: areaId
+            line_id: lineId
         })
         // return findPointById(id);
         return "Successfully added point! This endpoint will return the point's information when I finish findPointById()"
@@ -169,6 +259,30 @@ async function addPoint(point, { graphId, areaId }, username) {
     }
     return await verify()
 }
+
+async function findPoints({ graphId, lineId }, username) {
+    async function verify() {
+        const results = await db('lines as l')
+        .join('graphs as g', 'g.id', 'l.graph_id')
+        .join('users as u', 'u.id', 'g.user_id')
+        .select('l.*', 'u.username', 'g.id', 'l.id')
+        .where({ 'u.username': username })
+        .where({ 'g.id': graphId })
+        .where({ 'l.id': lineId })
+        if(!results.length){
+            return "This graph or area does not belong to the logged user"
+        } else {
+            return db('points as p')
+            .join('lines as l', 'l.id', 'p.line_id')
+            .join('graphs as g', 'g.id', 'l.graph_id')
+            .select('p.*', 'l.id as line_id')
+            .where({ 'g.id': graphId })
+            .where({ 'l.id': lineId })
+        }
+    }
+        return await verify()
+}
+
 function editPoint(point) {
 }
 // Collapse
