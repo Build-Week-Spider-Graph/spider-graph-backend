@@ -5,20 +5,25 @@ module.exports = {
     findGraphById,
     addGraph,
     editGraph,
+    deleteGraph,
 //
     findLines,
     findLineById,
     addLine,
+    editLine,
+    deleteLine,
 //
     findAreas,
     findAreaById,
     addArea,
     editArea,
+    deleteArea,
 //
     findPoints,
     findPointsByAreaId,
     addPoint,
-    editPoint
+    editPoint,
+    deletePoint
 };
 // Graphs
 function findGraphs(username) {
@@ -59,8 +64,18 @@ async function addGraph(graph, username) {
     })
     return findGraphById(id);
 }
-function editGraph(graph, id) {
+function editGraph(graph, id, username) {
+    return db('graphs')
+        .where({ id })
+        .update({
+            ...graph,
+        })
 }
+function deleteGraph(id, username) {
+    return db('graphs')
+      .where('id', id)
+      .del();
+  }
 async function findLines(graphId, username) {
     async function verify() {
         const results = await db('graphs as g')
@@ -122,7 +137,18 @@ async function addLine(line, graphId, username) {
     }
     return await verify()
 }
-
+function editLine(line, id, username) {
+    return db('lines')
+        .where({ id })
+        .update({
+            ...line,
+        })
+}
+function deleteLine(id, username) {
+    return db('lines')
+      .where('id', id)
+      .del();
+  }
 // Areas
 async function findAreas(graphId, username) {
     async function verify() {
@@ -186,8 +212,18 @@ async function addArea(area, graphId, username) {
     }
     return await verify()
 }
-function editArea(area, id) {
+function editArea(area, id, username) {
+    return db('areas')
+        .where({ id })
+        .update({
+            ...area,
+        })
 }
+function deleteArea(id, username) {
+    return db('areas')
+      .where('id', id)
+      .del();
+  }
 // Points
 async function findPoints({ graphId, lineId }, username) {
     async function verify() {
@@ -281,8 +317,18 @@ async function findPoints({ graphId, lineId }, username) {
         return await verify()
 }
 
-function editPoint(point) {
+function editPoint(point, id, username) {
+    return db('points')
+    .where({ id })
+    .update({
+        ...point,
+    })
 }
+function deletePoint(id, username) {
+    return db('points')
+      .where('id', id)
+      .del();
+  }
 // Collapse
 
 
