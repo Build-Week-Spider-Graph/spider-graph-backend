@@ -19,19 +19,31 @@ router.get('/:graphId', restricted, (req, res) => {
     const username = req.decodedJwt.username
     Graphs
     .findGraphById(graphId)
-    .then(graph => {
+    .then(async graph => {
         Graphs.findAreas(graphId, username)
         .then(areas => {
             graph[0].areas = areas;
-            Graphs.findLines(graphId, username)
-            .then(lines => {
-                graph[0].lines = lines
-                res.status(200).json(graph)
+        Graphs.findLines(graphId, username)
+        .then(lines => {
+            graph[0].lines = lines
+            lines.map((e, index) => {
+                // console.log(e, "before found")
+                Graphs.findPointsSecret(e.id)
+                .then(points => {
+                    console.log(points, "found")
+                    graph[0].lines[index].points = {...points, points}
+                })
+            })
+            res.status(200).json(graph)
             })
         })
+
     })
     .catch(err => res.send(err))
 })
+
+
+
 // POST api/graphs/
 router.post('/', restricted, (req, res) => {
     const username = req.decodedJwt.username
@@ -45,10 +57,22 @@ router.post('/', restricted, (req, res) => {
 })
 // PUT api/graphs/:id
 router.put('/:graphId', restricted, (req, res) => {
+    const graph = req.body
     const graphId = req.params.graphId
     const username = req.decodedJwt.username
     Graphs
     .editGraph(graph, graphId, username)
+    .then(graph => {
+        res.json(graph)
+    })
+    .catch(err => res.send(err))
+})
+// DELETE api/graphs/:id
+router.delete('/:graphId', restricted, (req, res) => {
+    const graphId = req.params.graphId
+    const username = req.decodedJwt.username
+    Graphs
+    .deleteGraph(graphId, username)
     .then(graph => {
         res.json(graph)
     })
@@ -87,6 +111,29 @@ router.get('/:graphId/lines/:lineId', restricted, (req, res) => {
     .findLineById({ graphId, lineId }, username)
     .then(line => {
             res.json(line)
+    })
+    .catch(err => res.send(err))
+})
+// PUT /api/graphs/:id/lines/:id
+router.put('/:graphId/lines/:lineId', restricted, (req, res) => {
+    const username = req.decodedJwt.username
+    const newLine = req.body
+    const lineId = req.params.lineId
+    Graphs
+    .editLine(newLine, lineId, username)
+    .then(line => {
+        res.json(line)
+    })
+    .catch(err => res.send(err))
+})
+// DELETE api/graphs/:id/lines/:id
+router.delete('/:graphId/lines/:lineId', restricted, (req, res) => {
+    const lineId = req.params.graphId
+    const username = req.decodedJwt.username
+    Graphs
+    .deleteLine(lineId, username)
+    .then(line => {
+        res.json(line)
     })
     .catch(err => res.send(err))
 })
@@ -129,26 +176,30 @@ router.post('/:graphId/areas/', restricted, (req, res) => {
     })
     .catch(err => res.send(err))
 })
-// PUT api/graphs/:id/areas/:id
-router.get('/:graphId/areas/:areaId', restricted, (req, res) => {
-    const { graphId, areaId } = req.params
+// PUT /api/graphs/:id/areas/:id
+router.put('/:graphId/areas/:areaId', restricted, (req, res) => {
+    const areaId = req.params.graphId
     const username = req.decodedJwt.username
+    const area = req.body
     Graphs
-    .findGraphById(graphId, username)
-    .then(graph => {
-        Graphs.findAreaById( { graphId, areaId }, username)
-        .then(area => {
-            graph[0].area = area;
-            Graphs.findPointsByAreaId({ graphId, areaId }, username)
-            .then(points => {
-                area[0].points = points
-                res.status(200).json(graph)
-            })
-        })
+    .editArea(area, areaId, username)
+    .then(area => {
+        res.json(area)
     })
     .catch(err => res.send(err))
 })
-/////////////////
+// DELETE api/graphs/:id/areas/:id
+router.delete('/:graphId/areas/:lineId', restricted, (req, res) => {
+    const areaId = req.params.areaId
+    const username = req.decodedJwt.username
+    Graphs
+    .deleteLine(areaId, username)
+    .then(area => {
+        res.json(area)
+    })
+    .catch(err => res.send(err))
+})
+//////////////////
 // GET api/graphs/:id/lines/:id/points
 router.get('/:graphId/lines/:lineId/points', restricted, (req, res) => {
     const { graphId, lineId } = req.params
@@ -183,12 +234,24 @@ router.post('/:graphId/lines/:lineId/points', restricted, (req, res) => {
     })
     .catch(err => res.send(err))
 })
-// PUT api/graphs/:id/areas/:id/points/:id
-router.put('/:graphId/areas/:areaId/points/:pointId', restricted, (req, res) => {
-    const { graphId, areaId, pointId } = req.params
+// PUT api/graphs/:id/lines/:id/points/:id
+router.put('/:graphId/lines/:lineId/points/:pointId', restricted, (req, res) => {
+    const id = req.params.pointId
+    const username = req.decodedJwt.username
+    const point = req.body
+    Graphs
+    .editPoint(point, id, username)
+    .then(point => {
+        res.json(point)
+    })
+    .catch(err => res.send(err))
+})
+// DELETE api/graphs/:id/lines/:id/points/:id
+router.delete('/:graphId/lines/:lineId/points/:pointId', restricted, (req, res) => {
+    const pointId = req.params.pointId
     const username = req.decodedJwt.username
     Graphs
-    .editPoint(point, { graphId, areaId, pointId }, username)
+    .deletePoint(pointId, username)
     .then(point => {
         res.json(point)
     })
