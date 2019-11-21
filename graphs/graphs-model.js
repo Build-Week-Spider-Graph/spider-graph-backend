@@ -29,14 +29,14 @@ function findGraphs(username) {
     .where({ 'u.username': username })
 }
 function findGraphById(graphId, username) {
-    // return db('graphs as g')
-    // .join('users as u', 'u.id', 'g.user_id')
-    // .select('g.*', 'u.username', 'g.id')
+    return db('graphs as g')
+    .join('users as u', 'u.id', 'g.user_id')
+    .select('g.*', 'u.username', 'g.id')
     // .where({ 'u.username': username })
-    // .where({ 'g.id': graphId })
-    return db('graphs')
-    .where({ "graphs.id": graphId })
-    .first();
+    .where({ 'g.id': graphId })
+    // return db('graphs')
+    // .where({ "graphs.id": graphId })
+    // .first();
 }
 async function addGraph(graph, username) {
     const {area, points, ...newGraph} = graph
