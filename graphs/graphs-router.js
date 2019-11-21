@@ -19,19 +19,28 @@ router.get('/:graphId', restricted, (req, res) => {
     const username = req.decodedJwt.username
     Graphs
     .findGraphById(graphId)
-    .then(graph => {
+    .then(async graph => {
         Graphs.findAreas(graphId, username)
         .then(areas => {
             graph[0].areas = areas;
-            Graphs.findLines(graphId, username)
-            .then(async lines => {
-                graph[0].lines = lines
-                res.status(200).json(graph)
+        Graphs.findLines(graphId, username)
+        .then(lines => {
+            graph[0].lines = lines
+            lines.map((e, index) => {
+                // console.log(e, "before found")
+                Graphs.findPointsSecret(e.id)
+                .then(points => {
+                    console.log(points, "found")
+                    graph[0].lines[index].points = {...points, points}
                 })
             })
+            res.status(200).json(graph)
+            })
         })
-        .catch(err => res.send(err))
+
     })
+    .catch(err => res.send(err))
+})
 
 
 

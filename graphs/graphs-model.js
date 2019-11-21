@@ -23,8 +23,16 @@ module.exports = {
     findPointsByAreaId,
     addPoint,
     editPoint,
-    deletePoint
+    deletePoint,
+    findPointsSecret
 };
+
+function findPointsSecret(lineId){
+    return db('points as p')
+    .select('p.*')
+    .where({ 'p.line_id': lineId })
+}
+
 // Graphs
 function findGraphs(username) {
     return db('graphs as g')
@@ -95,7 +103,7 @@ async function findLines(graphId, username) {
     }
         return await verify();
 }
-async function findLineById( { graphId, lineId }, username) {
+async function findLineById({ graphId, lineId }, username) {
     async function verify() {
         const results = await db('graphs as g')
         .join('users as u', 'u.id', 'g.user_id')
@@ -232,16 +240,18 @@ async function findPoints({ graphId, lineId }, username) {
         .select('l.*', 'u.username', 'g.id', 'l.id')
         .where({ 'u.username': username })
         .where({ 'g.id': graphId })
-        .where({ 'l.id': lineId })
         if(!results.length){
             return "This graph or area does not belong to the logged user"
         } else {
+            console.log()
             return db('points as p')
             .join('lines as l', 'l.id', 'p.line_id')
             .join('graphs as g', 'g.id', 'l.graph_id')
-            .select('p.*')
+            .join('areas_points as ap', 'p.id', 'ap.point_id')
+            .join('areas as a', 'a.id', 'ap.area_id')
+            .select('p.*', 'g.*', 'ap.id as area_id')
             .where({ 'g.id': graphId })
-            .where({ 'l.id': lineId })
+            .where({ 'p.line_id': lineId })
         }
     }
         return await verify()
@@ -329,7 +339,5 @@ function deletePoint(id, username) {
       .del();
   }
 // Collapse
-
-
 
 
