@@ -249,7 +249,7 @@ async function findPoints({ graphId, lineId }, username) {
             .join('graphs as g', 'g.id', 'l.graph_id')
             .join('areas_points as ap', 'p.id', 'ap.point_id')
             .join('areas as a', 'a.id', 'ap.area_id')
-            .select('p.*', 'g.*', 'ap.id as area_id')
+            .select('p.*', 'g.*', 'ap.area_id as area_id')
             .where({ 'g.id': graphId })
             .where({ 'p.line_id': lineId })
         }
