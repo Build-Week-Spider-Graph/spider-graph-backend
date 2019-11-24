@@ -11,7 +11,8 @@ exports.up = function(knex) {
     })
     .createTable('graphs', t => {
         t.increments();
-        t.string('title', 255).notNullable();
+        t.string('title', 255)
+            .notNullable();
         t
         .integer('user_id')
         .unsigned()
@@ -45,8 +46,10 @@ exports.up = function(knex) {
     })
     .createTable('points', t => {
         t.increments();
-        t.string('label', 255).notNullable();
-        t.integer('position');
+        t.string('label', 255)
+            .notNullable()
+            .unique();
+        t.integer('position')
         t
         .integer('line_id')
         .unsigned()

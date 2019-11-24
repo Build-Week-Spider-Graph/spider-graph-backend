@@ -35,10 +35,21 @@ function findPointsSecret(lineId){
 
 // Graphs
 function findGraphs(username) {
+    async function verify() {
+        const results = await db('graphs as g')
+        .join('users as u', 'u.id', 'g.user_id')
+        .select('g.*', 'u.id', 'g.id')
+        .where({ 'u.username': username })
+        if(!results.length){
+            return "This graph does not belong to the logged user"
+        } else {
     return db('graphs as g')
     .join('users as u', 'u.id', 'g.user_id')
     .select('g.*', 'g.id')
     .where({ 'u.username': username })
+        }
+    }
+        return verify()
 }
 function findGraphById(graphId, username) {
     return db('graphs as g')
@@ -301,29 +312,6 @@ async function addPoint(point, { graphId, lineId }, username) {
     }
     return await verify()
 }
-
-// async function findPoints({ graphId, lineId }, username) {
-//     async function verify() {
-//         const results = await db('lines as l')
-//         .join('graphs as g', 'g.id', 'l.graph_id')
-//         .join('users as u', 'u.id', 'g.user_id')
-//         .select('l.*', 'u.username', 'g.id', 'l.id')
-//         .where({ 'u.username': username })
-//         .where({ 'g.id': graphId })
-//         .where({ 'l.id': lineId })
-//         if(!results.length){
-//             return "This graph or area does not belong to the logged user"
-//         } else {
-//             return db('points as p')
-//             .join('lines as l', 'l.id', 'p.line_id')
-//             .join('graphs as g', 'g.id', 'l.graph_id')
-//             .select('p.*', 'l.id as line_id')
-//             .where({ 'g.id': graphId })
-//             .where({ 'l.id': lineId })
-//         }
-//     }
-//         return await verify()
-// }
 
 function editPoint(point, id, username) {
     return db('points')

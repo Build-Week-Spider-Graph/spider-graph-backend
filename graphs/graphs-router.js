@@ -20,24 +20,17 @@ router.get('/:graphId', restricted, (req, res) => {
     Graphs
     .findGraphById(graphId)
     .then(async graph => {
+        if(graph.lines){
         Graphs.findAreas(graphId, username)
         .then(areas => {
             graph[0].areas = areas;
         Graphs.findLines(graphId, username)
         .then(lines => {
             graph[0].lines = lines
-            lines.map((e, index) => {
-                // console.log(e, "before found")
-                Graphs.findPointsSecret(e.id)
-                .then(points => {
-                    console.log(points, "found")
-                    graph[0].lines[index].points = {...points, points}
-                })
-            })
             res.status(200).json(graph)
             })
         })
-
+        }
     })
     .catch(err => res.send(err))
 })
