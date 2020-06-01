@@ -250,13 +250,13 @@ router.delete('/:graphId/lines/:lineId/points/:pointId', restricted, (req, res) 
     })
     .catch(err => res.send(err))
 })
-router.delete('/:graphId', (req, res) => {
+router.delete('/:graphId', restricted, (req, res) => {
     Graphs.remove(req.params.id)
     .then(count => {
       if (count > 0) {
         res.status(200).json({ message: 'The graph has been deleted' });
       } else {
-        res.status(404).json({ message: 'The hub could not be found' });
+        res.status(404).json({ message: 'The graph could not be found' });
       }
     })
     .catch(error => {
